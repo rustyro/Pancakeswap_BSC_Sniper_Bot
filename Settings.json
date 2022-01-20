@@ -1,6 +1,6 @@
 {
-    "metamask_address": "0x42406785b7ea5c78f5Ae41F69eF53CD5D742ea16",
-    "metamask_private_key": "beb9d34f9f8649166d13ba27afeaab17144b86dbc4210d5a970823006e663dcc" ,
+    "metamask_address": "",
+    "metamask_private_key": "" ,
 
     "RPC": "https://bsc-dataseed1.defibit.io/",
     "GWEI_GAS": 10,
