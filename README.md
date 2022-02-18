@@ -1,29 +1,30 @@
 # 🚀 Pancakeswap BSC Sniper Bot 🚀
-![TradingTigers](https://trading-tigers.com/assets/img/TradingTigers.png)  
+![TradingTigers](https://trading-tigers.com/logos/TradingTigers.png)  
 Web3 Pancakeswap Sniper && Take Profit/StopLose bot written in python3, Please note the license conditions!
 ### The first Binance Smart Chain sniper bot with Honeypot checker!  
-![Sniper](https://trading-tigers.com/assets/img/preview001.png)
-
+![Sniper](https://trading-tigers.com/logos/preview001.png)  
 # Infos
 This Tool only buys/sells with/to BNB but use Multi Hops to get the best Output!
 Attention, You pay [0.7% Tax](https://docs.trading-tigers.com/tokenomics/tokenomics) on your swap amount!
 
 ### Support Us&You by Buying [TradingTigers Token](https://bscscan.com/token/0x34faa80fec0233e045ed4737cc152a71e490e2e3)  
-![Sniper](https://trading-tigers.com/assets/img/preview002.png)  
+![Sniper](https://trading-tigers.com/logos/preview002.png)  
 
 # Download
 ### If you are not familiar with Python please have a look at [Releases](https://github.com/Trading-Tiger/Pancakeswap_BSC_Sniper_Bot/releases), there you can download Windows executable.
 
 ### Setup your Address and secret key in Settings.json and Run main-GUI.exe.
-## [Visit also the Polygon Matic Sniper bot from our partnership Erra.tech.](https://github.com/erra-tech/Quickswap_MATIC_Sniper_Bot)
 
 # Install
 First of all, you need install Python3+
-Run on Android you need Install [Termux](https://termux.com/)  
+Run on Android you need Install [Termux](https://termux.com/) only from F-Droid works atm. 
 ```shell
-termux: $ pkg install python git
-Debian/Ubuntu: $ sudo apt install python3 git make gcc
-Windows: Need to install Visual Studio BuildTools & Python3
+termux: 
+$ pkg install python git cmake 
+Debian/Ubuntu: 
+$ sudo apt install python3 git cmake gcc
+Windows:
+You Need to install Visual Studio BuildTools & Python3
 ```
 
 ### Setup your Address and secret key in Settings.json.
@@ -61,6 +62,7 @@ Here are all options with infos:
 
 '-nb' or '--nobuy', No Buy, Skipp buy, if you want to use only TakeProfit/StopLoss/TrailingStopLoss
 '-tp' or '--takeprofit', Percentage TakeProfit from your input BNB amount. e.g. "-tp 50" 
+'-sl' or '--stoploss', Percentage StopLoss from your input BNB amount. e.g. "-sl 50" 
 '-tsl'or '--trailingstoploss', 'Percentage Trailing-Stop-loss from your first Quote "-tsl 50"
 
 '-so' or '--sellonly', Sell ALL your Tokens from given token address

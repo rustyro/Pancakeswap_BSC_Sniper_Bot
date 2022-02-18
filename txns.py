@@ -59,10 +59,10 @@ class TXN:
             keys = json.load(f)
         if len(keys["metamask_address"]) <= 41:
             print(style.RED + "Set your Address in the keys.json file!" + style.RESET)
-            sys.exit()
+            raise SystemExit
         if len(keys["metamask_private_key"]) <= 42:
             print(style.RED + "Set your PrivateKey in the keys.json file!" + style.RESET)
-            sys.exit()
+            raise SystemExit
         return keys["metamask_address"], keys["metamask_private_key"]
 
     def setupSlippage(self):
@@ -77,7 +77,7 @@ class TXN:
         return self.w3.eth.block_number
 
     def setup_swapper(self):
-        swapper_address = Web3.toChecksumAddress("0xAfbd3c3ED030d45484E10334aB9b15C3414DD142")
+        swapper_address = Web3.toChecksumAddress("0xdEdf20172b6dC39817026c125f52d4fad8E0f29b")
         with open("./abis/BSC_Swapper.json") as f:
             contract_abi = json.load(f)
         swapper = self.w3.eth.contract(address=swapper_address, abi=contract_abi)
@@ -92,19 +92,20 @@ class TXN:
     def get_token_balance(self):
         return self.token_contract.functions.balanceOf(self.address).call() / (
                     10 ** self.token_contract.functions.decimals().call())
-
     def checkToken(self):
-        tokenInfos = self.swapper.functions.getTokenInfos(self.token_address).call()
-        buy_tax = round((tokenInfos[0] - tokenInfos[1]) / tokenInfos[0] * 100)
-        sell_tax = round((tokenInfos[2] - tokenInfos[3]) / tokenInfos[2] * 100)
+        tokenInfos = self.swapper.functions.getTokenInformations(self.token_address).call()
+        buy_tax = round((tokenInfos[0] - tokenInfos[1]) / tokenInfos[0] * 100 ,2)
+        sell_tax = round((tokenInfos[2] - tokenInfos[3]) / tokenInfos[2] * 100 ,2)
         if tokenInfos[5] and tokenInfos[6] == True:
             honeypot = False
         else:
             honeypot = True
+        print(style.GREEN +"[TOKENTAX] Current Token BuyTax:",buy_tax ,"%" + style.RESET)
+        print(style.GREEN +"[TOKENTAX] Current Token SellTax:",sell_tax ,"%" + style.RESET)
         return buy_tax, sell_tax, honeypot
 
     def checkifTokenBuyDisabled(self):
-        disabled = self.swapper.functions.getTokenInfos(self.token_address).call()[
+        disabled = self.swapper.functions.getTokenInformations(self.token_address).call()[
             4]  # True if Buy is enabled, False if Disabled.
         # todo: find a solution for bugged tokens that never can be buy.
         return disabled
@@ -118,13 +119,14 @@ class TXN:
         gas = gas + (gas / 10)  # Adding 1/10 from gas to gas!
         maxGasBNB = Web3.fromWei(gas * self.gas_price, "ether")
         print(style.GREEN + "\nMax Transaction cost " + str(maxGasBNB) + " BNB" + style.RESET)
+
         if maxGasBNB > self.MaxGasInBNB:
             print(style.RED + "\nTx cost exceeds your settings, exiting!")
-            sys.exit()
+            raise SystemExit
         return gas
 
     def getOutputfromBNBtoToken(self):
-        call = self.swapper.functions.getOutputfromBNBtoToken(
+        call = self.swapper.functions.getOutputfromETHtoToken(
             self.token_address,
             int(self.quantity * (10 ** 18)),
         ).call()
@@ -134,7 +136,7 @@ class TXN:
 
     def getOutputfromTokentoBNB(self, last_price=0):
         try:
-            call = self.swapper.functions.getOutputfromTokentoBNB(
+            call = self.swapper.functions.getOutputfromTokentoETH(
                 self.token_address,
                 int(self.token_contract.functions.balanceOf(self.address).call()),
             ).call()
@@ -145,10 +147,14 @@ class TXN:
             print("Poor connection. Attempting to reconnect...")
             return last_price * (10 ** 18),
 
+    def getLiquidityBNB(self):
+        raw_call = self.swapper.functions.fetchLiquidityETH(self.token_address).call()
+        real = raw_call / (10**18)
+        return raw_call, real
 
     def buy_token(self):
         self.quantity = Decimal(self.quantity) * (10 ** 18)
-        txn = self.swapper.functions.fromBNBtoToken(
+        txn = self.swapper.functions.fromETHtoToken(
             self.address,
             self.token_address,
             self.slippage
@@ -209,11 +215,10 @@ class TXN:
 
     def sell_tokens(self):
         self.approve()
-        txn = self.swapper.functions.fromTokentoBNB(
+        txn = self.swapper.functions.fromTokentoETH(
             self.address,
             self.token_address,
-            int(self.token_contract.functions.balanceOf(self.address).call() - 1),
-            # Only a test, because some users have TransferFrom error, but i think its comes from Slippage.
+            int(self.token_contract.functions.balanceOf(self.address).call()),
             self.slippage
         ).buildTransaction(
             {'from': self.address,
