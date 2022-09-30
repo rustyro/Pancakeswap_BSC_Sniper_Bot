@@ -19,12 +19,12 @@ ascii = """
 spinneroptions = {'interval': 250, 'frames': ['🚀 ', '🌙 ', '🚀 ', '🌕 ', '💸 ']}
 
 parser = argparse.ArgumentParser(
-    description='Set your Token and Amount example: "sniper.py -t 0x34faa80fec0233e045'
-                'ed4737cc152a71e490e2e3 -a 0.2 -s 15"')
+    description='Set your Token and Amount example: '
+                '"sniper.py -t 0x34faa80fec0233e045ed4737cc152a71e490e2e3 -a 0.2 -s 15"')
 parser.add_argument('-t', '--token', help='str, Token for snipe e.g. "-t 0x34faa80fec0233e045ed4737cc152a71e490e2e3"')
 parser.add_argument('-a', '--amount', default=0, help='float, Amount in Bnb to snipe e.g. "-a 0.1"')
 parser.add_argument('-tx', '--txamount', default=1, nargs="?", const=1, type=int,
-                    help='int, how mutch tx you want to send? It Split your BNB Amount in e.g. "-tx 5"')
+                    help='int, how much tx you want to send? It Split your BNB Amount in e.g. "-tx 5"')
 parser.add_argument('-hp', '--honeypot', action="store_true",
                     help='Check if your token to buy is a Honeypot, e.g. "-hp" or "--honeypot"')
 parser.add_argument('-nb', '--nobuy', action="store_true",
@@ -58,12 +58,12 @@ class SniperBot():
         self.SayWelcome()
 
     def loadSettings(self):
-        with open("Settings.json", "r") as settings:
+        with open("settings.json", "r") as settings:
             settings = json.load(settings)
         return settings
 
     def SayWelcome(self):
-        print(style().YELLOW + ascii + style().RESET)
+        # print(style().YELLOW + ascii + style().RESET)
         print(style().GREEN + """Attention, You pay a 0.7% Tax on your swap amount!""" + style().RESET)
         print(style().GREEN + "Start Sniper Tool with following arguments:" + style().RESET)
         print(style().BLUE + "---------------------------------" + style().RESET)
@@ -297,10 +297,10 @@ class SniperBot():
             elif honeyTax[2] == False:
                 print(style().GREEN + "[DONE] Token is NOT a Honeypot!" + style().RESET)
         if honeyTax[1] > self.settings["MaxSellTax"]:
-            print(style().RED + "Token SellTax exceeds Settings.json, exiting!")
+            print(style().RED + "Token SellTax exceeds settings.json, exiting!")
             raise SystemExit
         if honeyTax[0] > self.settings["MaxBuyTax"]:
-            print(style().RED + "Token BuyTax exceeds Settings.json, exiting!")
+            print(style().RED + "Token BuyTax exceeds settings.json, exiting!")
             raise SystemExit
         if self.wb != 0:
             self.awaitBlocks()
@@ -309,8 +309,7 @@ class SniperBot():
             if args.nobuy != True:
                 self.awaitBuy()
 
-        sleep(
-            7)  # Give the RPC/WS some time to Index your address nonce, make it higher if " ValueError: {'code': -32000, 'message': 'nonce too low'} "
+        sleep(7)  # Give the RPC/WS some time to Index your address nonce, make it higher if " ValueError: {'code': -32000, 'message': 'nonce too low'} "
         self.awaitApprove()
 
         if self.tsl != 0 or self.stoploss != 0 or self.takeProfitOutput != 0:

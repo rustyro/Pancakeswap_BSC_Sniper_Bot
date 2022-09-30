@@ -10,5 +10,6 @@
 
     "MinLiquidityBNB": 0.5,
     "MaxSellTax": 25,
-    "MaxBuyTax": 15
+    "MaxBuyTax": 15,
+    "rand": 1
 }

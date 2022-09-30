@@ -13,7 +13,7 @@ Attention, You pay [0.7% Tax](https://docs.trading-tigers.com/tokenomics/tokenom
 # Download
 ### If you are not familiar with Python please have a look at [Releases](https://github.com/Trading-Tiger/Pancakeswap_BSC_Sniper_Bot/releases), there you can download Windows executable.
 
-### Setup your Address and secret key in Settings.json and Run main-GUI.exe.
+### Setup your Address and secret key in settings.json and Run main-GUI.exe.
 
 # Install
 First of all, you need install Python3+
@@ -27,7 +27,7 @@ Windows:
 You Need to install Visual Studio BuildTools & Python3
 ```
 
-### Setup your Address and secret key in Settings.json.
+### Setup your Address and secret key in settings.json.
 
 Clone Repo:  
 ```shell

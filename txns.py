@@ -17,7 +17,7 @@ amount_keys = ["value", "gasPrice"]
 
 
 def connect():
-    with open("./Settings.json") as f:
+    with open("./settings.json") as f:
         keys = json.load(f)
     if keys["RPC"][:2].lower() == "ws":
         w3 = Web3(Web3.WebsocketProvider(keys["RPC"]))
@@ -29,19 +29,26 @@ def connect():
 w3 = connect()
 
 
+def setup_token(token_address, _w3=w3):
+    with open("./abis/bep20_abi_token.json") as f:
+        contract_abi = json.load(f)
+    token_contract = _w3.eth.contract(address=token_address, abi=contract_abi)
+    return token_contract
+
+
 class TXN:
     def __init__(self, token_address, quantity, show_value=True):
         self.w3 = w3
         self.address, self.private_key = self.setup_address()
         self.token_address = Web3.toChecksumAddress(token_address)
-        self.token_contract = self.setup_token()
+        self.token_contract = setup_token(self.token_address)
         self.swapper_address, self.swapper = self.setup_swapper()
         self.slippage = self.setupSlippage()
         self.quantity = quantity
         self.MaxGasInBNB, self.gas_price = self.setupGas()
 
     def connect(self):
-        with open("./Settings.json") as f:
+        with open("./settings.json") as f:
             keys = json.load(f)
         if keys["RPC"][:2].lower() == "ws":
             w3 = Web3(Web3.WebsocketProvider(keys["RPC"]))
@@ -50,12 +57,12 @@ class TXN:
         return w3
 
     def setupGas(self):
-        with open("./Settings.json") as f:
+        with open("./settings.json") as f:
             keys = json.load(f)
         return keys['MaxTXFeeBNB'], int(keys['GWEI_GAS'] * (10 ** 9))
 
     def setup_address(self):
-        with open("./Settings.json") as f:
+        with open("./settings.json") as f:
             keys = json.load(f)
         if len(keys["metamask_address"]) <= 41:
             print(style.RED + "Set your Address in the keys.json file!" + style.RESET)
@@ -66,7 +73,7 @@ class TXN:
         return keys["metamask_address"], keys["metamask_private_key"]
 
     def setupSlippage(self):
-        with open("./Settings.json") as f:
+        with open("./settings.json") as f:
             keys = json.load(f)
         return keys['Slippage']
 
@@ -254,3 +261,12 @@ class TXN:
             if isinstance(v, HexBytes):
                 res[k] = v.hex()
         return res
+
+    def get_value(self, txhash) -> float:
+
+        dets = self.get_details(txhash)
+        if not dets.get("value"):
+            value = self.getOutputfromTokentoBNB()[0]
+            dets["value"] = value / (10 ** 18)
+
+        return int(self.token_contract.functions.balanceOf(self.address).call() - 1)
